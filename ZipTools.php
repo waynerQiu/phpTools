@@ -24,12 +24,12 @@ class ZipTools{
      * @param $path
      * @param $zip
      **/
-    public function addFileToZip($path,$zip){
+    public function addFileToZip($path,$zipPath){
 
         // 转化 \ 为 / ，适应 windows
-        $file_tools = new FileTools();
-        $path = $file_tools->dirPath($path);
-
+        $path = MyFile::dirPath($path);
+        $zip = new ZipArchive();
+        $zip->open($zipPath, ZipArchive::CREATE);
         // 判断是不是目录，是的话递归进入
         if(is_dir($path)) {
             $handler = opendir($path); //打开当前文件夹由$path指定。
@@ -38,7 +38,7 @@ class ZipTools{
                     //文件夹文件名字为'.'和'..'，不要对他们进行操作
                     if (is_dir($path . "/" . $filename)) {
                         // 如果读取的某个对象是文件夹，则递归
-                        $this->addFileToZip($path . "/" . $filename, $zip);
+                        self::addFileToZip($path . "/" . $filename, $zip);
                     } else { //将文件加入zip对象
                         $zip->addFile($path . "/" . $filename);
                     }
@@ -48,8 +48,9 @@ class ZipTools{
             $zip->addFile($path);
         }
         @closedir($path);
-
+        $zip->close();
         echo 'zip压缩成功';
+
 
     }
 
