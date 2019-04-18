@@ -188,14 +188,18 @@ class FileTools{
      */
     function getDirTree($dir, $parentid = 0, $dirs = array()) {
 
-        global $id;
-        if ($parentid == 0) $id = 0;
+        if ($parentid == 0){
+            $id = 0;
+        }
+        
         $list = glob($dir.'*');
         foreach($list as $v) {
             if (is_dir($v)) {
-                $id++;
                 $dirs[$id] = array('id'=>$id,'parent_id'=>$parentid, 'name'=>basename($v), 'dir'=>$v.'/');
-                $dirs = $this->getDirTree($v.'/', $id, $dirs);
+                $dirs = self::getDirTree($v.'/', $id, $dirs);
+                $id++;
+            }else{
+                $dirs[$parentid]['file'][]=$v;
             }
         }
         return $dirs;
